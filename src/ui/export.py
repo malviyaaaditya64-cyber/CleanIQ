@@ -7,10 +7,23 @@ from src.report_generator import generate_pdf
 
 def show_export():
 
-    st.markdown("# 💾 Export Center")
-    st.caption("Export your cleaned dataset and reports")
+    st.markdown("""
+    <div style="
+    background:linear-gradient(135deg,#0f172a,#2563eb,#7c3aed);
+    padding:30px;
+    border-radius:20px;
+    color:white;
+    margin-bottom:25px;
+    ">
 
-    st.divider()
+    <h1>💾 Export Center</h1>
+
+    <p style="font-size:18px;">
+    Download Cleaned Dataset • Reports • Excel • CSV
+    </p>
+
+    </div>
+    """, unsafe_allow_html=True)
 
     if "cleaned_df" not in st.session_state:
 
@@ -19,33 +32,49 @@ def show_export():
 
     cleaned_df = st.session_state["cleaned_df"]
 
-    # =====================================
-    # Dataset Summary
-    # =====================================
-
     summary = {
+
         "Rows": cleaned_df.shape[0],
+
         "Columns": cleaned_df.shape[1],
+
         "Missing Values": int(cleaned_df.isna().sum().sum()),
+
         "Duplicate Rows": int(cleaned_df.duplicated().sum())
+
     }
+
+    st.markdown("## 📊 Export Overview")
+
+    c1, c2, c3, c4 = st.columns(4)
+
+    with c1:
+        st.metric("📄 Rows", f"{summary['Rows']:,}")
+
+    with c2:
+        st.metric("📑 Columns", summary["Columns"])
+
+    with c3:
+        st.metric("❌ Missing", summary["Missing Values"])
+
+    with c4:
+        st.metric("🔁 Duplicate", summary["Duplicate Rows"])
+
+    st.divider()
 
     health_score = 100
     quality_score = 100
 
-    # =====================================
-    # CSV
-    # =====================================
-
-    csv = cleaned_df.to_csv(index=False).encode("utf-8")
-
-    # =====================================
-    # Excel
-    # =====================================
+    csv = cleaned_df.to_csv(
+        index=False
+    ).encode("utf-8")
 
     excel_buffer = io.BytesIO()
 
-    with pd.ExcelWriter(excel_buffer, engine="openpyxl") as writer:
+    with pd.ExcelWriter(
+        excel_buffer,
+        engine="openpyxl"
+    ) as writer:
 
         cleaned_df.to_excel(
             writer,
@@ -54,10 +83,6 @@ def show_export():
         )
 
     excel_data = excel_buffer.getvalue()
-
-    # =====================================
-    # PDF
-    # =====================================
 
     pdf_file = "CleanIQ_Report.pdf"
 
@@ -68,74 +93,94 @@ def show_export():
         pdf_file
     )
 
-    # =====================================
-    # Download Buttons
-    # =====================================
+    st.markdown("## 📥 Download Center")
 
-    st.subheader("📥 Download Files")
+    col1, col2, col3 = st.columns(3)
 
-    c1, c2, c3 = st.columns(3)
+    with col1:
 
-    with c1:
-
-        st.download_button(
-            "📄 CSV",
-            csv,
-            "cleaned_dataset.csv",
-            "text/csv",
+         st.download_button(
+            "📄 Download CSV",
+            data=csv,
+            file_name="CleanIQ_Cleaned_Dataset.csv",
+            mime="text/csv",
             use_container_width=True,
             type="primary"
         )
 
-    with c2:
+    with col2:
 
         st.download_button(
-            "📊 Excel",
-            excel_data,
-            "cleaned_dataset.xlsx",
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            "📊 Download Excel",
+            data=excel_data,
+            file_name="CleanIQ_Cleaned_Dataset.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             use_container_width=True
         )
 
-    with c3:
+    with col3:
 
         with open(pdf_file, "rb") as pdf:
 
             st.download_button(
-                "📕 PDF Report",
-                pdf.read(),
-                "CleanIQ_Report.pdf",
-                "application/pdf",
+                "📕 Download PDF Report",
+                data=pdf.read(),
+                file_name="CleanIQ_Report.pdf",
+                mime="application/pdf",
                 use_container_width=True
             )
 
     st.divider()
 
-    # =====================================
-    # Preview
-    # =====================================
+    # ======================================
+    # Dataset Preview
+    # ======================================
 
-    st.subheader("👀 Cleaned Dataset Preview")
+    st.markdown("## 👀 Cleaned Dataset Preview")
 
     st.dataframe(
-        cleaned_df.head(20),
+        cleaned_df.head(25),
         use_container_width=True,
-        height=420
+        height=450
     )
 
     st.divider()
 
-    # =====================================
-    # Export Summary
-    # =====================================
+    # ======================================
+    # Export Statistics
+    # ======================================
 
-    st.subheader("📋 Export Summary")
+    st.markdown("## 📋 Export Statistics")
 
-    st.write(f"**Rows:** {summary['Rows']:,}")
-    st.write(f"**Columns:** {summary['Columns']}")
-    st.write(f"**Missing Values:** {summary['Missing Values']}")
-    st.write(f"**Duplicate Rows:** {summary['Duplicate Rows']}")
+    left, right = st.columns(2)
+
+    with left:
+
+        st.info(f"""
+### 📊 Dataset Summary
+
+- 📄 Rows : **{summary['Rows']:,}**
+- 📑 Columns : **{summary['Columns']}**
+- ❌ Missing Values : **{summary['Missing Values']}**
+- 🔁 Duplicate Rows : **{summary['Duplicate Rows']}**
+""")
+
+    with right:
+
+        st.info("""
+### 📦 Available Export Formats
+
+✅ CSV Dataset
+
+✅ Excel Workbook
+
+✅ Professional PDF Report
+
+✅ Ready for Machine Learning
+
+✅ Portfolio Ready
+""")
 
     st.divider()
 
-    st.success("✅ Export completed successfully.")
+    st.success("✅ Export completed successfully. Your cleaned dataset is ready for download.")

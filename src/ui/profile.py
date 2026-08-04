@@ -21,11 +21,26 @@ def show_profile(df, summary, health_score):
     # Header
     # =====================================
 
-    st.markdown("# 📊 Dashboard")
-    st.caption("AI Powered Dataset Profiling")
+    st.markdown("""
+<div style="
+background:linear-gradient(135deg,#2563eb,#7c3aed);
+padding:30px;
+border-radius:20px;
+color:white;
+margin-bottom:20px;
+">
 
-    st.divider()
+<h1 style="margin-bottom:5px;">
+📊 Dataset Intelligence Dashboard
+</h1>
 
+<p style="font-size:18px;">
+AI Powered Dataset Profiling & Quality Assessment
+</p>
+
+</div>
+""", unsafe_allow_html=True)
+    
     # =====================================
     # Dashboard Cards
     # =====================================
@@ -43,7 +58,9 @@ def show_profile(df, summary, health_score):
 
     quality_score = calculate_quality_score(df)
 
-    st.subheader("🎯 Data Quality Score")
+    st.markdown("## 🎯 Overall Data Quality Score")
+
+ 
 
     icon = "🟢"
 
@@ -61,6 +78,16 @@ def show_profile(df, summary, health_score):
     st.progress(
         quality_score / 100
     )
+
+    if quality_score >= 90:
+     st.success("🟢 Excellent dataset. Ready for analytics.")
+
+    elif quality_score >= 75:
+     st.warning("🟡 Good dataset. Minor improvements recommended.")
+
+    else:
+     st.error("🔴 Dataset quality is low. Cleaning is recommended.")
+
 
     st.divider()
 
@@ -125,7 +152,7 @@ def show_profile(df, summary, health_score):
     # Dataset Preview
     # =====================================
 
-    st.subheader("👀 Dataset Preview")
+    st.markdown("## 👀 Live Dataset Preview")
 
     st.dataframe(
         df.head(20),
@@ -139,7 +166,7 @@ def show_profile(df, summary, health_score):
     # Column Intelligence
     # =====================================
 
-    st.subheader("🧠 Column Intelligence")
+    st.markdown("## 🧠 AI Column Intelligence")
 
     report = analyze_columns(df)
 
@@ -155,7 +182,7 @@ def show_profile(df, summary, health_score):
     # Missing Values
     # =====================================
 
-    st.subheader("📉 Missing Values")
+    st.markdown("## 📉 Missing Value Analysis")
 
     missing = (
         df.isna()
@@ -183,7 +210,7 @@ def show_profile(df, summary, health_score):
     # Data Types
     # =====================================
 
-    st.subheader("📊 Data Types")
+    st.markdown("## 📊 Column Data Types")
 
     dtype_df = pd.DataFrame({
         "Datatype": df.dtypes.astype(str)
@@ -208,7 +235,7 @@ def show_profile(df, summary, health_score):
     # Smart Type Detection
     # =====================================
 
-    st.subheader("🤖 Smart Data Type Detection")
+    st.markdown("## 🤖 AI Smart Type Detection")
 
     type_report = detect_column_types(df)
 
@@ -245,5 +272,11 @@ def show_profile(df, summary, health_score):
     show_chat_assistant(df)
 
     st.divider()
+
+    st.markdown("---")
+
+st.success("🎉 Dataset profiling completed successfully.")
+
+st.balloons()
 
 show_history()

@@ -1,5 +1,4 @@
 import streamlit as st
-import pandas as pd
 import plotly.express as px
 
 
@@ -13,12 +12,13 @@ def show_charts(df):
         st.warning("No numeric columns found.")
         return
 
-    # -----------------------------
+    # ==========================================
     # Correlation Heatmap
-    # -----------------------------
+    # ==========================================
+
     st.subheader("🔥 Correlation Heatmap")
 
-    corr = numeric_df.corr(numeric_only=True)
+    corr = numeric_df.corr()
 
     fig = px.imshow(
         corr,
@@ -27,87 +27,84 @@ def show_charts(df):
         aspect="auto"
     )
 
-    fig.update_layout(height=650)
-
-    st.plotly_chart(
-        fig,
-        use_container_width=True
+    fig.update_layout(
+        height=650,
+        template="plotly_white",
+        paper_bgcolor="white",
+        plot_bgcolor="white",
+        font=dict(size=14),
+        margin=dict(l=20, r=20, t=50, b=20)
     )
+
+    st.plotly_chart(fig, use_container_width=True)
 
     st.divider()
 
-    # -----------------------------
+    # ==========================================
     # Histogram
-    # -----------------------------
+    # ==========================================
+
     st.subheader("📈 Histogram")
 
     column = st.selectbox(
         "Select Numeric Column",
         numeric_df.columns,
-        key="histogram_column"
+        key="histogram"
     )
 
     fig = px.histogram(
         df,
         x=column,
         nbins=30,
+        color_discrete_sequence=["#2563eb"],
         title=f"{column} Distribution"
     )
 
-    st.plotly_chart(
-        fig,
-        use_container_width=True
-    )
+    fig.update_layout(template="plotly_white")
+
+    st.plotly_chart(fig, use_container_width=True)
 
     st.divider()
 
-    # -----------------------------
+    # ==========================================
     # Box Plot
-    # -----------------------------
+    # ==========================================
+
     st.subheader("📦 Box Plot")
 
     box_col = st.selectbox(
         "Select Column",
         numeric_df.columns,
-        key="boxplot_column"
+        key="boxplot"
     )
 
     fig = px.box(
         df,
         y=box_col,
-        points="outliers"
+        points="outliers",
+        color_discrete_sequence=["#7c3aed"]
     )
 
-    st.plotly_chart(
-        fig,
-        use_container_width=True
-    )
+    fig.update_layout(template="plotly_white")
+
+    st.plotly_chart(fig, use_container_width=True)
 
     st.divider()
 
-    # -----------------------------
+    # ==========================================
     # Missing Values
-    # -----------------------------
+    # ==========================================
+
     st.subheader("❌ Missing Values")
 
-    missing = (
-        df.isna()
-        .sum()
-        .reset_index()
-    )
+    missing = df.isna().sum().reset_index()
+    missing.columns = ["Column", "Missing"]
 
-    missing.columns = [
-        "Column",
-        "Missing"
-    ]
-
-    missing = missing[
-        missing["Missing"] > 0
-    ]
+    missing = missing[missing["Missing"] > 0]
 
     if missing.empty:
 
-        st.success("No Missing Values Found.")
+        st.success("🎉 No Missing Values Found")
 
     else:
 
@@ -115,24 +112,24 @@ def show_charts(df):
             missing,
             x="Column",
             y="Missing",
-            color="Missing"
+            color="Missing",
+            color_continuous_scale="Reds"
         )
 
-        st.plotly_chart(
-            fig,
-            use_container_width=True
-        )
+        fig.update_layout(template="plotly_white")
+
+        st.plotly_chart(fig, use_container_width=True)
 
     st.divider()
 
-    # -----------------------------
-    # Datatype Distribution
-    # -----------------------------
+    # ==========================================
+    # Data Type Distribution
+    # ==========================================
+
     st.subheader("🧩 Data Type Distribution")
 
     dtype_df = (
-        df.dtypes
-        .astype(str)
+        df.dtypes.astype(str)
         .value_counts()
         .reset_index()
     )
@@ -146,19 +143,20 @@ def show_charts(df):
         dtype_df,
         names="Datatype",
         values="Count",
-        hole=0.5
+        hole=0.65,
+        color_discrete_sequence=px.colors.qualitative.Set3
     )
 
-    st.plotly_chart(
-        fig,
-        use_container_width=True
-    )
-    
+    fig.update_layout(template="plotly_white")
+
+    st.plotly_chart(fig, use_container_width=True)
+
     st.divider()
 
-    # -----------------------------
-    # Scatter Plot Explorer
-    # -----------------------------
+    # ==========================================
+    # Scatter Plot
+    # ==========================================
+
     st.subheader("📌 Scatter Plot Explorer")
 
     if len(numeric_df.columns) >= 2:
@@ -168,7 +166,7 @@ def show_charts(df):
         with col1:
 
             x_axis = st.selectbox(
-                "Select X-axis",
+                "X Axis",
                 numeric_df.columns,
                 key="scatter_x"
             )
@@ -176,9 +174,9 @@ def show_charts(df):
         with col2:
 
             y_axis = st.selectbox(
-                "Select Y-axis",
+                "Y Axis",
                 numeric_df.columns,
-                index=min(1, len(numeric_df.columns)-1),
+                index=1,
                 key="scatter_y"
             )
 
@@ -186,9 +184,12 @@ def show_charts(df):
             df,
             x=x_axis,
             y=y_axis,
-            title=f"{x_axis} vs {y_axis}",
-            opacity=0.75
+            opacity=0.8,
+            color_discrete_sequence=["#2563eb"],
+            title=f"{x_axis} vs {y_axis}"
         )
+
+        fig.update_layout(template="plotly_white")
 
         st.plotly_chart(
             fig,
@@ -197,4 +198,4 @@ def show_charts(df):
 
     else:
 
-        st.info("Scatter plot requires at least 2 numeric columns.")
+        st.info("Scatter Plot requires at least 2 numeric columns.")

@@ -8,76 +8,115 @@ from src.ui.activity_log import add_activity
 
 def show_cleaning(df):
 
-    st.markdown("# 🧹 Smart Cleaning Center")
-    st.caption("Interactive AI Powered Data Cleaning")
+    st.markdown("""
+    <div style="
+    background:linear-gradient(135deg,#0f172a,#2563eb,#7c3aed);
+    padding:30px;
+    border-radius:20px;
+    color:white;
+    margin-bottom:25px;
+    ">
 
-    st.divider()
+    <h1>🧹 Smart Cleaning Center</h1>
 
-    st.subheader("⚙️ Select Cleaning Operations")
+    <p style="font-size:18px;">
+    AI Powered Automated Data Cleaning & Quality Improvement
+    </p>
 
-    remove_duplicates = st.checkbox(
-        "Remove Duplicate Rows",
-        value=True
-    )
+    </div>
+    """, unsafe_allow_html=True)
 
-    fill_missing = st.checkbox(
-        "Fill Missing Values",
-        value=True
-    )
+    # ======================================
+    # Dataset Summary
+    # ======================================
 
-    trim_spaces = st.checkbox(
-        "Trim Extra Spaces",
-        value=True
-    )
-
-    standardize_text = st.checkbox(
-        "Standardize Text",
-        value=True
-    )
-
-    optimize_types = st.checkbox(
-        "Optimize Data Types",
-        value=True
-    )
-
-    remove_empty = st.checkbox(
-        "Remove Empty Rows",
-        value=True
-    )
-
-    st.divider()
+    st.markdown("## 📊 Current Dataset Status")
 
     c1, c2, c3, c4 = st.columns(4)
 
-    c1.metric(
-        "Rows",
-        df.shape[0]
-    )
+    with c1:
+        st.metric(
+            "📄 Rows",
+            f"{df.shape[0]:,}"
+        )
 
-    c2.metric(
-        "Columns",
-        df.shape[1]
-    )
+    with c2:
+        st.metric(
+            "📑 Columns",
+            df.shape[1]
+        )
 
-    c3.metric(
-        "Missing",
-        int(df.isna().sum().sum())
-    )
+    with c3:
+        st.metric(
+            "❌ Missing Values",
+            int(df.isna().sum().sum())
+        )
 
-    c4.metric(
-        "Duplicates",
-        int(df.duplicated().sum())
-    )
+    with c4:
+        st.metric(
+            "🔁 Duplicate Rows",
+            int(df.duplicated().sum())
+        )
 
     st.divider()
 
+    # ======================================
+    # Cleaning Options
+    # ======================================
+
+    st.markdown("## ⚙️ AI Cleaning Options")
+
+    left, right = st.columns(2)
+
+    with left:
+
+        remove_duplicates = st.checkbox(
+            "🗑️ Remove Duplicate Rows",
+            value=True
+        )
+
+        fill_missing = st.checkbox(
+            "🩹 Fill Missing Values",
+            value=True
+        )
+
+        trim_spaces = st.checkbox(
+            "✂️ Trim Extra Spaces",
+            value=True
+        )
+
+    with right:
+
+        standardize_text = st.checkbox(
+            "🔤 Standardize Text",
+            value=True
+        )
+
+        optimize_types = st.checkbox(
+            "⚡ Optimize Data Types",
+            value=True
+        )
+
+        remove_empty = st.checkbox(
+            "🧹 Remove Empty Rows",
+            value=True
+        )
+
+    st.divider()
+
+    st.markdown("### 🚀 Ready to Clean?")
+
     if st.button(
-        "🚀 Start Smart Cleaning",
+        "🚀 Start AI Smart Cleaning",
         use_container_width=True,
         type="primary"
     ):
 
-        with st.spinner("Cleaning Dataset..."):
+        progress = st.progress(0)
+
+        with st.spinner("Cleaning dataset..."):
+
+            progress.progress(20)
 
             cleaned_df, report = auto_fix_dataset(
                 df,
@@ -89,47 +128,69 @@ def show_cleaning(df):
                 remove_empty=remove_empty
             )
 
+            progress.progress(60)
+
             st.session_state["cleaned_df"] = cleaned_df
 
-            st.success("✅ Dataset cleaned successfully.")
+            progress.progress(100)
+
+            st.success("✅ Smart Cleaning Completed Successfully")
 
             st.divider()
 
-            st.subheader("📋 Cleaning Report")
+
+                        # ======================================
+            # Cleaning Report
+            # ======================================
+
+            st.markdown("## 📋 Cleaning Report")
 
             for item in report:
-
                 st.success(item)
 
             st.divider()
 
-            st.subheader("📊 Before vs After")
+            # ======================================
+            # Before vs After
+            # ======================================
 
-            cc1, cc2, cc3, cc4 = st.columns(4)
+            st.markdown("## 📈 Before vs After Comparison")
 
-            cc1.metric(
-                "Rows",
-                df.shape[0],
-                cleaned_df.shape[0] - df.shape[0]
-            )
+            b1, b2, b3, b4 = st.columns(4)
 
-            cc2.metric(
-                "Columns",
-                df.shape[1],
-                cleaned_df.shape[1] - df.shape[1]
-            )
+            before_missing = int(df.isna().sum().sum())
+            after_missing = int(cleaned_df.isna().sum().sum())
 
-            cc3.metric(
-                "Missing",
-                int(df.isna().sum().sum()),
-                int(cleaned_df.isna().sum().sum()) - int(df.isna().sum().sum())
-            )
+            before_duplicates = int(df.duplicated().sum())
+            after_duplicates = int(cleaned_df.duplicated().sum())
 
-            cc4.metric(
-                "Duplicates",
-                int(df.duplicated().sum()),
-                int(cleaned_df.duplicated().sum()) - int(df.duplicated().sum())
-            )
+            with b1:
+                st.metric(
+                    "Rows",
+                    df.shape[0],
+                    cleaned_df.shape[0] - df.shape[0]
+                )
+
+            with b2:
+                st.metric(
+                    "Columns",
+                    df.shape[1],
+                    cleaned_df.shape[1] - df.shape[1]
+                )
+
+            with b3:
+                st.metric(
+                    "Missing",
+                    before_missing,
+                    after_missing - before_missing
+                )
+
+            with b4:
+                st.metric(
+                    "Duplicates",
+                    before_duplicates,
+                    after_duplicates - before_duplicates
+                )
 
             st.divider()
 
@@ -140,24 +201,48 @@ def show_cleaning(df):
 
             st.divider()
 
-            st.subheader("👀 Cleaned Dataset Preview")
+            # ======================================
+            # Cleaned Dataset Preview
+            # ======================================
+
+            st.markdown("## 👀 Cleaned Dataset Preview")
 
             st.dataframe(
-                cleaned_df.head(20),
+                cleaned_df.head(25),
                 use_container_width=True,
-                height=400
+                height=420
             )
 
             st.divider()
 
+            # ======================================
+            # Column Operations
+            # ======================================
+
             show_column_operations(cleaned_df)
 
-            add_activity("Smart Dataset Cleaning")
+            st.divider()
+
+            # ======================================
+            # Download
+            # ======================================
+
+            csv = cleaned_df.to_csv(index=False).encode("utf-8")
+
+            st.download_button(
+                "⬇️ Download Cleaned Dataset",
+                csv,
+                file_name="CleanIQ_Cleaned_Dataset.csv",
+                mime="text/csv",
+                use_container_width=True
+            )
+
+            add_activity("Smart Dataset Cleaning Completed")
 
     else:
 
         st.info(
-            "Select the cleaning options above and click **Start Smart Cleaning**."
+            "👆 Select cleaning options and click **Start AI Smart Cleaning** to clean your dataset."
         )
 
     

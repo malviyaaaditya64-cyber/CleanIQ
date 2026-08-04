@@ -1,58 +1,120 @@
 import streamlit as st
 
 
+def card(title, value, icon, color):
+
+    st.markdown(f"""
+    <div style="
+
+    background:white;
+
+    border-radius:22px;
+
+    padding:22px;
+
+    box-shadow:0 15px 35px rgba(0,0,0,.08);
+
+    border-top:6px solid {color};
+
+    transition:.3s;
+
+    margin-bottom:15px;
+
+    ">
+
+    <div style="font-size:34px;">
+    {icon}
+    </div>
+
+    <div style="
+    color:#6b7280;
+    font-size:15px;
+    margin-top:8px;
+    ">
+    {title}
+    </div>
+
+    <div style="
+    font-size:34px;
+    font-weight:800;
+    color:#111827;
+    margin-top:8px;
+    ">
+    {value}
+    </div>
+
+    </div>
+    """, unsafe_allow_html=True)
+
+
 def show_dashboard_cards(summary, health_score):
 
-    st.markdown("## 📌 Dataset Overview")
+    st.markdown("## 📊 Executive Dashboard")
 
-    col1, col2, col3, col4 = st.columns(4)
+    row1 = st.columns(4)
 
-    with col1:
-        st.metric(
-            "📄 Rows",
-            f"{summary['Rows']:,}"
+    with row1[0]:
+        card(
+            "Rows",
+            f"{summary['Rows']:,}",
+            "📄",
+            "#2563eb"
         )
 
-    with col2:
-        st.metric(
-            "📑 Columns",
-            summary["Columns"]
+    with row1[1]:
+        card(
+            "Columns",
+            summary["Columns"],
+            "📑",
+            "#7c3aed"
         )
 
-    with col3:
-        st.metric(
-            "🩺 Health",
-            f"{health_score}%"
+    with row1[2]:
+        card(
+            "Health Score",
+            f"{health_score}%",
+            "🩺",
+            "#16a34a"
         )
 
-    with col4:
-        st.metric(
-            "❌ Missing",
-            summary["Missing Values"]
+    with row1[3]:
+        card(
+            "Missing Values",
+            summary["Missing Values"],
+            "❌",
+            "#dc2626"
         )
 
-    col5, col6, col7, col8 = st.columns(4)
+    row2 = st.columns(4)
 
-    with col5:
-        st.metric(
-            "🔁 Duplicates",
-            summary["Duplicate Rows"]
+    with row2[0]:
+        card(
+            "Duplicates",
+            summary["Duplicate Rows"],
+            "🔁",
+            "#ea580c"
         )
 
-    with col6:
-        st.metric(
-            "💾 Memory",
-            f"{summary['Memory Usage (MB)']} MB"
+    with row2[1]:
+        card(
+            "Memory",
+            f"{summary['Memory Usage (MB)']} MB",
+            "💾",
+            "#0f766e"
         )
 
-    with col7:
-        st.metric(
-            "🔢 Numeric",
-            summary["Numeric Columns"]
+    with row2[2]:
+        card(
+            "Numeric",
+            summary["Numeric Columns"],
+            "🔢",
+            "#4338ca"
         )
 
-    with col8:
-        st.metric(
-            "🔤 Categorical",
-            summary["Categorical Columns"]
+    with row2[3]:
+        card(
+            "Categorical",
+            summary["Categorical Columns"],
+            "🔤",
+            "#9333ea"
         )
